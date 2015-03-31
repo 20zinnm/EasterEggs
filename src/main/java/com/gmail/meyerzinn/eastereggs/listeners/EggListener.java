@@ -2,6 +2,8 @@ package com.gmail.meyerzinn.eastereggs.listeners;
 
 import java.util.Random;
 
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,24 +27,27 @@ public class EggListener implements Listener {
 	public void onProjectileHitEvent(ProjectileHitEvent e) {
 		if (e.getEntity() instanceof Egg) {
 			if (EasterEggs.allowEggs) {
-				Location l = e.getEntity().getLocation();
-				World w = e.getEntity().getWorld();
-				if (EasterEggs.broadcast) {
-					Bukkit.broadcastMessage(Lang.TITLE.toString()
-							+ Lang.EGG_LAND
-									.toString()
-									.replace(
-											"%l",
-											l.getX() + ", " + l.getY() + ", "
-													+ l.getZ())
-									.replace("%w", w.getName()));
-				}
-				if (getRandomBoolean()) {
-					w.createExplosion(l.getX(), l.getY(), l.getZ(), 6, false,
-							false);
-				} else {
-					for (ItemStack is : EasterEggs.drops) {
-						w.dropItem(l, is);
+					if (e.getEntity().getName()
+							.equals(ChatColor.AQUA + "Easter Egg!")) {
+						Location l = e.getEntity().getLocation();
+						World w = e.getEntity().getWorld();
+						if (EasterEggs.broadcast) {
+							Bukkit.broadcastMessage(Lang.TITLE.toString()
+									+ Lang.EGG_LAND
+											.toString()
+											.replace(
+													"%l",
+													l.getX() + ", " + l.getY()
+															+ ", " + l.getZ())
+											.replace("%w", w.getName()));
+						}
+						if (explodeYN()) {
+							w.createExplosion(l.getX(), l.getY(), l.getZ(), 6,
+									false, false);
+						} else {
+							for (ItemStack is : EasterEggs.drops) {
+								w.dropItem(l, is);
+							}
 					}
 				}
 			}
@@ -54,7 +59,8 @@ public class EggListener implements Listener {
 		if (e.getAction().equals(Action.RIGHT_CLICK_AIR)
 				|| e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			if (EasterEggs.allowEggs) {
-				if (e.getPlayer().getItemInHand().equals(Material.EGG)) {
+				if (e.getPlayer().getItemInHand().getType()
+						.equals(Material.EGG)) {
 					if (e.getPlayer().hasPermission("eastereggs.launch")) {
 						e.getPlayer().sendMessage(
 								Lang.TITLE.toString()
@@ -70,8 +76,18 @@ public class EggListener implements Listener {
 		}
 	}
 
-	public static boolean getRandomBoolean() {
-		return rnd.nextBoolean();
+	public static boolean explodeYN() {
+		if (EasterEggs.explode == 1.0) {
+			return true;
+		} else if (EasterEggs.explode == 0.0) {
+			return false;
+		} else {
+			if (rnd.nextDouble() <= EasterEggs.explode) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 
 }

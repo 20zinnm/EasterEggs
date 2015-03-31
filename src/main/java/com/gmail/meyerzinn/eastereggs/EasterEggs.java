@@ -22,9 +22,10 @@ import com.gmail.meyerzinn.eastereggs.listeners.EggListener;
 import com.gmail.meyerzinn.eastereggs.util.Lang;
 
 public class EasterEggs extends JavaPlugin {
-
+	
 	public static Boolean allowEggs;
 	public static Boolean broadcast;
+	public static Double explode;
 	public static List<ItemStack> drops = new ArrayList<ItemStack>();
 
 	Logger log = getLogger();
@@ -37,6 +38,7 @@ public class EasterEggs extends JavaPlugin {
 		saveDefaultConfig();
 		allowEggs = getConfig().getBoolean("allow-eggs");
 		broadcast = getConfig().getBoolean("announce-land");
+		explode = getConfig().getDouble("explode");
 		loadLang();
 		loadDrops();
 		getCommand("eggs").setExecutor(new EggsCommand());
@@ -46,7 +48,10 @@ public class EasterEggs extends JavaPlugin {
 	}
 
 	public void onDisable() {
+		saveDefaultConfig();
 		getConfig().set("allow-eggs", allowEggs);
+		getConfig().set("announce-land", broadcast);
+		getConfig().set("explode", explode);
 		saveConfig();
 		saveDrops();
 	}
