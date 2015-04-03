@@ -3,13 +3,10 @@ package com.gmail.meyerzinn.eastereggs;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -17,16 +14,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.meyerzinn.eastereggs.commands.AddDropCommand;
 import com.gmail.meyerzinn.eastereggs.commands.EggsCommand;
+import com.gmail.meyerzinn.eastereggs.commands.ListDropsCommand;
 import com.gmail.meyerzinn.eastereggs.commands.RemoveDropCommand;
 import com.gmail.meyerzinn.eastereggs.listeners.EggListener;
 import com.gmail.meyerzinn.eastereggs.util.Lang;
 
 public class EasterEggs extends JavaPlugin {
-	
+
 	public static Boolean allowEggs;
 	public static Boolean broadcast;
 	public static Double explode;
-	public static List<ItemStack> drops = new ArrayList<ItemStack>();
+	public static HashMap<Long, ItemStack> drops = new HashMap<Long, ItemStack>();
 
 	Logger log = getLogger();
 
@@ -44,6 +42,7 @@ public class EasterEggs extends JavaPlugin {
 		getCommand("eggs").setExecutor(new EggsCommand());
 		getCommand("adddrop").setExecutor(new AddDropCommand());
 		getCommand("removedrop").setExecutor(new RemoveDropCommand());
+		getCommand("listdrops").setExecutor(new ListDropsCommand());
 		Bukkit.getPluginManager().registerEvents(new EggListener(), this);
 	}
 
@@ -73,8 +72,10 @@ public class EasterEggs extends JavaPlugin {
 				}
 			} catch (IOException e) {
 				e.printStackTrace(); // So they notice
-				log.severe("[PluginName] Couldn't create language file.");
-				log.severe("[PluginName] This is a fatal error. Now disabling");
+				log.severe(Lang.TITLE.toString()
+						+ "Couldn't create language file.");
+				log.severe(Lang.TITLE.toString()
+						+ "This is a fatal error. Now disabling");
 				this.setEnabled(false); // Without it loaded, we can't send them
 										// messages
 			}
@@ -91,10 +92,11 @@ public class EasterEggs extends JavaPlugin {
 		try {
 			conf.save(getLangFile());
 		} catch (IOException e) {
-			log.log(Level.WARNING, "PluginName: Failed to save lang.yml.");
-			log.log(Level.WARNING,
-					"PluginName: Report this stack trace to <your name>.");
+			log.severe(Lang.TITLE.toString() + "Couldn't create language file.");
+			log.severe(Lang.TITLE.toString()
+					+ "This is a fatal error. Now disabling");
 			e.printStackTrace();
+			this.setEnabled(false);
 		}
 	}
 
@@ -122,9 +124,8 @@ public class EasterEggs extends JavaPlugin {
 		}
 		FileConfiguration fc = YamlConfiguration.loadConfiguration(f);
 		for (String key : fc.getKeys(false)) {
-			ItemStack is = new ItemStack(Material.getMaterial(key),
-					fc.getInt(key));
-			drops.add(is);
+			ItemStack is = fc.getItemStack(key);
+			drops.put(Long.parseLong(key), is);
 		}
 	}
 
@@ -138,8 +139,8 @@ public class EasterEggs extends JavaPlugin {
 			}
 		}
 		FileConfiguration fc = YamlConfiguration.loadConfiguration(f);
-		for (ItemStack is : drops) {
-			fc.set(is.getType().name().toString(), is.getAmount());
+		for (Long id : drops.keySet()) {
+			fc.set(id.toString(), drops.get(id));
 		}
 		try {
 			fc.save(f);

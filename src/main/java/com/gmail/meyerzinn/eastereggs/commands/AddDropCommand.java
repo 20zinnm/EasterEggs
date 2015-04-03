@@ -20,10 +20,10 @@ public class AddDropCommand implements CommandExecutor {
 				if (args.length == 0) {
 					Player p = (Player) sender;
 					ItemStack is = p.getItemInHand();
-					if (is == null || is.equals(Material.AIR)) {
+					if (is == null || is.getType().equals(Material.AIR)) {
 						p.sendMessage(Lang.TITLE.toString() + Lang.MUST_HAVE_ITEM.toString());
 					} else {
-						EasterEggs.drops.add(is);
+						EasterEggs.drops.put(System.currentTimeMillis(), is);
 						p.sendMessage(Lang.TITLE.toString() + Lang.ADDED_DROP.toString());
 					}
 				} else {

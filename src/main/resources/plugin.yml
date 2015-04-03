@@ -13,3 +13,6 @@ commands:
   removedrop:
     description: Use to remove drops.
     usage: /removedrop [indexnumber]
+  listdrops:
+    description: Use to list drops.
+    usage: /removedrop [indexnumber]

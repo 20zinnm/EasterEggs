@@ -16,22 +16,32 @@ public class RemoveDropCommand implements CommandExecutor {
 		if (sender.hasPermission("eastereggs.removedrop")) {
 			if (args.length == 0) {
 				sender.sendMessage(ChatColor.AQUA + "Drops: ");
-				for (int i = 0; i < EasterEggs.drops.size(); i++) {
-					sender.sendMessage("["
-							+ (i + 1)
+				for (Long id : EasterEggs.drops.keySet()) {
+					sender.sendMessage(ChatColor.GREEN
+							+ "["
+							+ id.toString()
 							+ "] "
-							+ EasterEggs.drops.get(i).getType().name()
+							+ EasterEggs.drops.get(id).getType().name()
 									.toString() + ", x"
-							+ EasterEggs.drops.get(i).getAmount());
+							+ EasterEggs.drops.get(id).getAmount());
 				}
 			} else if (args.length == 1) {
-				try {
-					Integer indexN = Integer.parseInt(args[0]);
-					EasterEggs.drops.remove(indexN - 1);
+				if (args[0].equalsIgnoreCase("all")) {
+					EasterEggs.drops.clear();
 					sender.sendMessage(Lang.TITLE.toString()
 							+ Lang.REMOVED_DROP.toString());
-				} catch (NumberFormatException e) {
-					sender.sendMessage(Lang.TITLE.toString() + Lang.NUMBER_ONLY.toString());
+				} else {
+					try {
+						EasterEggs.drops.remove(Long.parseLong(args[0]));
+						sender.sendMessage(Lang.TITLE.toString()
+								+ Lang.REMOVED_DROP.toString());
+					} catch (NumberFormatException e) {
+						sender.sendMessage(Lang.TITLE.toString()
+								+ Lang.NUMBER_ONLY.toString());
+					} catch (Exception e) {
+						sender.sendMessage(Lang.TITLE.toString()
+								+ Lang.INVALID_ARGS.toString());
+					}
 				}
 			} else {
 				sender.sendMessage(Lang.TITLE.toString()

@@ -2,8 +2,6 @@ package com.gmail.meyerzinn.eastereggs.listeners;
 
 import java.util.Random;
 
-import net.md_5.bungee.api.ChatColor;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.gmail.meyerzinn.eastereggs.EasterEggs;
 import com.gmail.meyerzinn.eastereggs.util.Lang;
@@ -27,27 +24,25 @@ public class EggListener implements Listener {
 	public void onProjectileHitEvent(ProjectileHitEvent e) {
 		if (e.getEntity() instanceof Egg) {
 			if (EasterEggs.allowEggs) {
-					if (e.getEntity().getName()
-							.equals(ChatColor.AQUA + "Easter Egg!")) {
-						Location l = e.getEntity().getLocation();
-						World w = e.getEntity().getWorld();
-						if (EasterEggs.broadcast) {
-							Bukkit.broadcastMessage(Lang.TITLE.toString()
-									+ Lang.EGG_LAND
-											.toString()
-											.replace(
-													"%l",
-													l.getX() + ", " + l.getY()
-															+ ", " + l.getZ())
-											.replace("%w", w.getName()));
-						}
-						if (explodeYN()) {
-							w.createExplosion(l.getX(), l.getY(), l.getZ(), 6,
-									false, false);
-						} else {
-							for (ItemStack is : EasterEggs.drops) {
-								w.dropItem(l, is);
-							}
+
+				Location l = e.getEntity().getLocation();
+				World w = e.getEntity().getWorld();
+				if (EasterEggs.broadcast) {
+					Bukkit.broadcastMessage(Lang.TITLE.toString()
+							+ Lang.EGG_LAND
+									.toString()
+									.replace(
+											"%l",
+											l.getX() + ", " + l.getY() + ", "
+													+ l.getZ())
+									.replace("%w", w.getName()));
+				}
+				if (explodeYN()) {
+					w.createExplosion(l.getX(), l.getY(), l.getZ(), 6, false,
+							false);
+				} else {
+					for (Long id : EasterEggs.drops.keySet()) {
+						w.dropItem(l, EasterEggs.drops.get(id));
 					}
 				}
 			}
